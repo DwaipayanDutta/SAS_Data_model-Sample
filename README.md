@@ -59,14 +59,14 @@ From the confusion matrix, various performance metrics can be calculated, such a
 
 To create the logistic regression model in SAS using synthetic data, follow these steps:
 
-1. **Generate synthetic data** using the Python script `data_generator.py` provided in the repository.
-2. **Import the generated data into SAS**.
-3. **Perform exploratory data analysis** to understand the relationships between the predictor variables and the target variable.
-4. **Split the data into training and validation sets**.
-5. **Train the logistic regression model** using the training data.
-6. **Evaluate the model's performance** on the validation set using metrics such as accuracy, AUC, and the confusion matrix.
-7. **Fine-tune the model** if necessary and repeat steps 5-6.
-8. **Deploy the final model** for making predictions on new data.
+1. **Generate synthetic data** using the Python script `data_generator.py` provided in the repository. :snake:
+2. **Import the generated data into SAS**. :bar_chart:
+3. **Perform exploratory data analysis** to understand the relationships between the predictor variables and the target variable. :mag:
+4. **Split the data into training and validation sets**. :chart_with_upwards_trend:
+5. **Train the logistic regression model** using the training data. :chart_with_downwards_trend:
+6. **Evaluate the model's performance** on the validation set using metrics such as accuracy, AUC, and the confusion matrix. :trophy:
+7. **Fine-tune the model** if necessary and repeat steps 5-6. :wrench:
+8. **Deploy the final model** for making predictions on new data. :rocket:
 
 ## Usage
 
