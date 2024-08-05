@@ -39,4 +39,38 @@ $$IV = \sum_{i=1}^n (Good_i - Bad_i) \times \log\left(\frac{Good_i}{Bad_i}\right
 
 where:
 - **n** is the number of distinct values for the predictor variable
-- **Goodᵢ** is the proportion of good events
+- **Goodᵢ** is the proportion of good events for the i-th value
+- **Badᵢ** is the proportion of bad events for the i-th value
+
+## Confusion Matrix
+
+A confusion matrix is a table that summarizes the performance of a classification model. It shows the number of true positives (TP), true negatives (TN), false positives (FP), and false negatives (FN) for a binary classification problem.
+
+The confusion matrix looks like this:
+
+|      | Predicted Positive | Predicted Negative |
+|------|-------------------|-------------------|
+| Actual Positive | TP | FN |
+| Actual Negative | FP | TN |
+
+From the confusion matrix, various performance metrics can be calculated, such as accuracy, precision, recall, and F1-score.
+
+## Getting Started
+
+To create the logistic regression model in SAS using synthetic data, follow these steps:
+
+1. **Generate synthetic data** using the Python script `data_generator.py` provided in the repository.
+2. **Import the generated data into SAS**.
+3. **Perform exploratory data analysis** to understand the relationships between the predictor variables and the target variable.
+4. **Split the data into training and validation sets**.
+5. **Train the logistic regression model** using the training data.
+6. **Evaluate the model's performance** on the validation set using metrics such as accuracy, AUC, and the confusion matrix.
+7. **Fine-tune the model** if necessary and repeat steps 5-6.
+8. **Deploy the final model** for making predictions on new data.
+
+## Usage
+
+To run the Python script for generating synthetic data, execute the following command:
+
+```bash
+python data_generator.py
