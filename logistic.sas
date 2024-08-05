@@ -1,4 +1,4 @@
-/* Import data from CSV */
+/* Import data from a CSV file */
 proc import datafile='/path/to/your/data.csv' 
     out=mydata
     dbms=csv 
@@ -6,33 +6,30 @@ proc import datafile='/path/to/your/data.csv'
     getnames=yes;
 run;
 
-/* Split data into training (70%) and test (30%) */
+/* Split the dataset into training (70%) and testing (30%) subsets */
 proc surveyselect data=mydata out=train_test split=70 seed=42;
-    sampsize 70;
+    sampsize 70; /* Specify the sample size for training */
 run;
 
-data train;
+/* Create training and testing datasets */
+data train test;
     set train_test;
-    if selected = 1;
+    if selected = 1 then output train; /* Training data */
+    else output test; /* Testing data */
 run;
 
-data test;
-    set train_test;
-    if selected = 0;
-run;
-
-/* Create bins for categorical variables (example for ACCOUNT_TYPE) */
+/* Generate frequency distribution for the ACCOUNT_TYPE variable */
 proc freq data=train;
     tables ACCOUNT_TYPE / out=freq_account_type;
 run;
 
-/* Calculate Information Value for each bin */
+/* Calculate Information Value (IV) for each bin */
 data iv_account_type;
     set freq_account_type;
-    /* Calculate IV and other necessary metrics here */
+    /* Insert calculations for IV and other relevant metrics here */
 run;
 
-/* Logistic Regression with Stepwise Selection */
+/* Perform Logistic Regression with Stepwise Selection */
 proc logistic data=train descending;
     class ACCOUNT_TYPE (param=ref) CUSTOMER_TAG (param=ref) EDUCATION_LEVEL (param=ref) 
           GENDER (param=ref) INTERNET_BANKING_USAGE (param=ref) MARITAL_STATUS (param=ref) 
@@ -49,25 +46,28 @@ proc logistic data=train descending;
                                   LI_FLAG MASS_FLAG MBK_ACTIVE MF_FLAG MONTHLY_BALANCE NRV
                                   NR_FLAG TOTAL_LIVE_SECURED_AMT TOTAL_LIVE_UNSECURED_AMT
                                   VINTAGE_DAYS / selection=stepwise slentry=0.05 slstay=0.05;
-    output out=predicted p=prob;
+    output out=predicted p=prob; /* Output predicted probabilities */
 run;
 
-/* Evaluate model performance */
+/* Evaluate the performance of the model */
 proc freq data=predicted;
-    tables LI_FLAG*prob / chisq;
+    tables LI_FLAG*prob / chisq; /* Chi-square test for LI_FLAG vs. predicted probabilities */
 run;
 
-/* Compute sensitivity and recall manually */
+/* Manually compute sensitivity and recall */
 data metrics;
     set predicted;
     /* Convert probabilities to binary outcomes */
     predicted_class = (prob >= 0.5);
     
-    /* Confusion Matrix components */
-    if LI_FLAG = 1 and predicted_class = 1 then TP + 1;
-    else if LI_FLAG = 1 and predicted_class = 0 then FN + 1;
-    else if LI_FLAG = 0 and predicted_class = 1 then FP + 1;
-    else if LI_FLAG = 0 and predicted_class = 0 then TN + 1;
+    /* Initialize confusion matrix components */
+    retain TP 0 FN 0 FP 0 TN 0;
+
+    /* Update confusion matrix counts */
+    if LI_FLAG = 1 and predicted_class = 1 then TP + 1; /* True Positive */
+    else if LI_FLAG = 1 and predicted_class = 0 then FN + 1; /* False Negative */
+    else if LI_FLAG = 0 and predicted_class = 1 then FP + 1; /* False Positive */
+    else if LI_FLAG = 0 and predicted_class = 0 then TN + 1; /* True Negative */
 
     /* Calculate sensitivity and recall */
     sensitivity = TP / (TP + FN);
@@ -78,30 +78,27 @@ data metrics;
     put "Recall: " recall;
 run;
 
-/* Score test data using the logistic regression model */
+/* Score the test dataset using the logistic regression model */
 proc logistic inmodel=train descending;
-    score data=test out=scored_test;
+    score data=test out=scored_test; /* Output scored test dataset */
 run;
 
-/* Create Decile Plot */
+/* Create decile ranks based on predicted probabilities */
 proc rank data=scored_test out=ranked_test groups=10;
-    var prob; /* or the probability variable from the scoring output */
+    var prob; /* Use the probability variable from scoring output */
     ranks decile;
 run;
 
-/* Calculate the average LI_FLAG by decile */
+/* Calculate the average LI_FLAG for each decile */
 proc means data=ranked_test noprint;
     class decile;
     var LI_FLAG;
-    output out=decile_stats mean=mean_LI_FLAG;
+    output out=decile_stats mean=mean_LI_FLAG; /* Output mean LI_FLAG by decile */
 run;
 
 /* Plot the Decile Chart */
 proc sgplot data=decile_stats;
-    series x=decile y=mean_LI_FLAG / markers;
+    series x=decile y=mean_LI_FLAG / markers; /* Create a series plot */
     xaxis label="Decile";
     yaxis label="Mean LI_FLAG";
 run;
-
-
-
