@@ -144,3 +144,55 @@ proc fastclus data=ScaleSample maxclusters=10 out=Clusters;
        KYC_LAST_DONE_DATE MBK_ACTIVE MONTHLY_BALANCE NRV
        TOTAL_LIVE_SECURED_AMT TOTAL_LIVE_UNSECURED_AMT VINTAGE_DAYS;
 run;
+%macro calculate_iv(data=, target=, var=);
+    Data temp;
+        Set &data;
+        Keep &var &target;
+    Run;
+
+    /* Generate frequency distribution for the variable and target */
+    Proc freq data=temp noprint;
+        Tables &var*&target / out=freq_table;
+    Run;
+
+    /* Calculate total counts and proportions */
+    Data iv_table;
+        Set freq_table;
+        Retain total_good total_bad 0;
+
+        /* Calculate total counts for good and bad */
+        If &target = 1 then total_good + count;
+        Else if &target = 0 then total_bad + count;
+
+        /* Calculate the total count for the variable */
+        If _n_ = 1 then do;
+            Total = total_good + total_bad;
+        End;
+
+        /* Calculate proportions */
+        If &target = 1 then good_pct = count / total_good;
+        Else if &target = 0 then bad_pct = count / total_bad;
+
+        /* Calculate IV components */
+        If &target = 1 then do;
+            Iv_component = (good_pct – bad_pct) * log(good_pct / bad_pct);
+        End;
+        Else if &target = 0 then iv_component = 0;
+
+        /* Keep only relevant columns */
+        Keep &var good_pct bad_pct iv_component;
+    Run;
+
+    /* Summarize IV for the variable */
+    Proc sql;
+        Select sum(iv_component) into :iv_value from iv_table;
+    Quit;
+
+    /* Step 5: Display the IV value */
+    %put Information Value for &var: &iv_value;
+
+%mend 
+
+%calculate_iv(data=mydata, target=LI_FLAG, var=ACCOUNT_TYPE);
+%calculate_iv(data=mydata, target=LI_FLAG, var=AGE);
+%calculate_iv(data=mydata, target=LI_FLAG, var=CIBIL_SCORE);
