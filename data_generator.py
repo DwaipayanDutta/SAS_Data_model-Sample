@@ -98,3 +98,42 @@ class DataGenerator:
 data_generator = DataGenerator(n_samples=10000)
 dataset = data_generator.generate_dataset()
 print(dataset.head())
+
+
+
+
+
+# Model Code for testing :
+
+from xgboost import XGBClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+
+# Assuming you have the generated dataset
+dataset = data_generator.generate_dataset()
+
+# Convert categorical variables to numerical values
+categorical_cols = dataset.select_dtypes(include='object').columns
+le = LabelEncoder()
+for col in categorical_cols:
+    dataset[col] = le.fit_transform(dataset[col])
+
+# Fill missing values 
+dataset = dataset.fillna(0)
+
+# Split the dataset into features and target
+X = dataset.drop(['ACCOUNT_NO', 'LI_FLAG'], axis=1)
+y = dataset['LI_FLAG']
+
+# Split the dataset into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create an XGBoost classifier
+model = XGBClassifier()
+
+# Train the model
+model.fit(X_train, y_train)
+
+
+accuracy = model.score(X_test, y_test)
+print(f"Test Accuracy: {accuracy:.2f}")
