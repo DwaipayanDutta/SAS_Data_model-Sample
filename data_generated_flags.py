@@ -262,6 +262,11 @@ prob = {
 data_categorical = {}
 
 for variable, catg in cat_variables.items():
+    if variable not in prob or len(prob[variable]) != len(catg):
+        raise ValueError(f"Invalid probability distribution for {variable}")
+    if not np.isclose(sum(prob[variable]), 1.0):
+        raise ValueError(f"Probabilities for {variable} do not sum to 1")
+    data_categorical[variable] = np.random.choice(catg, N, p=prob[variable])
     data_categorical[variable] = np.random.choice(catg,N,p = prob[variable])
 
 data_cat = pd.DataFrame(data_categorical)
