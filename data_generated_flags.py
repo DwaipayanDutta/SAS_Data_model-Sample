@@ -201,6 +201,8 @@ cat_variables = {
 'NR_FLAG': ['Y','N']
 }
 
+# Probability distributions for data generation
+# Source: Market analysis report (2023) and historical data
 prob = {    
     'ACCOUNT_TYPE'           : [0.80,0.20],
     'CUSTOMER_TAG'           : [0.5,0.5],
