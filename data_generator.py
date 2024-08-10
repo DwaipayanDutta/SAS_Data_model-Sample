@@ -1,5 +1,12 @@
-import numpy as np
-import pandas as pd
+import subprocess
+import sys
+
+# Function to install missing packages
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+# List of required packages
+required_packages = ['numpy', 'pandas', 'colorama']
 
 class DataGenerator:
     def __init__(self, n_samples=10000):
