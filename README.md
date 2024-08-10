@@ -26,7 +26,6 @@ $$
 \log\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_n x_n
 $$
 
-
 where:
 - **p** is the probability of the event occurring
 - **β₀** is the intercept
@@ -41,7 +40,6 @@ The formula for IV is:
 $$
 IV = \sum_{i=1}^n (Good_i - Bad_i) \times \log\left(\frac{Good_i}{Bad_i}\right)
 $$
-
 
 where:
 - **n** is the number of distinct values for the predictor variable
@@ -65,14 +63,14 @@ From this matrix, various performance metrics can be derived, including accuracy
 
 To build the logistic regression model in SAS with synthetic data, follow these steps:
 
-1. **Generate Synthetic Data**: Run the Python script `data_generator.py` to create the synthetic dataset. 
-2. **Import Data into SAS**: Load the generated data into SAS. 📊
-3. **Perform Exploratory Data Analysis (EDA)**: Analyze the data to understand relationships between predictors and the target variable. 🔍
-4. **Split the Data**: Divide the data into training and validation sets. 📈
-5. **Train the Model**: Use the training data to build the logistic regression model. 📉
-6. **Evaluate Model Performance**: Assess the model using metrics such as accuracy, AUC, and the confusion matrix. 🏆
-7. **Fine-Tune the Model**: Adjust the model parameters if needed and re-evaluate. ⚙️
-8. **Deploy the Model**: Apply the final model to make predictions on new data. 🚀
+1. **Generate Synthetic Data**: <img src="https://cdn-icons-png.flaticon.com/512/3186/3186684.png" width="24" height="24" /> Run the Python script `data_generator.py` to create the synthetic dataset.
+2. **Import Data into SAS**: <img src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png" width="24" height="24" /> Load the generated data into SAS. 📊
+3. **Perform Exploratory Data Analysis (EDA)**: <img src="https://cdn-icons-png.flaticon.com/512/181/181550.png" width="24" height="24" /> Analyze the data to understand relationships between predictors and the target variable. 🔍
+4. **Split the Data**: <img src="https://cdn-icons-png.flaticon.com/512/2515/2515183.png" width="24" height="24" /> Divide the data into training and validation sets. 📈
+5. **Train the Model**: <img src="https://cdn-icons-png.flaticon.com/512/1069/1069754.png" width="24" height="24" /> Use the training data to build the logistic regression model. 📉
+6. **Evaluate Model Performance**: <img src="https://cdn-icons-png.flaticon.com/512/217/217964.png" width="24" height="24" /> Assess the model using metrics such as accuracy, AUC, and the confusion matrix. 🏆
+7. **Fine-Tune the Model**: <img src="https://cdn-icons-png.flaticon.com/512/2169/2169821.png" width="24" height="24" /> Adjust the model parameters if needed and re-evaluate. ⚙️
+8. **Deploy the Model**: <img src="https://cdn-icons-png.flaticon.com/512/1828/1828859.png" width="24" height="24" /> Apply the final model to make predictions on new data. 🚀
 
 ## Usage
 
