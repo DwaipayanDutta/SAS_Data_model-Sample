@@ -100,22 +100,24 @@ dataset = data_generator.generate_dataset()
 print(dataset.head())
 
 
-
-
-
 # Model Code for testing :
+from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 import shap
 import matplotlib.pyplot as plt
+import pandas as pd
 
-# Calling funct
+# Generate dataset
 data_generator = DataGenerator(n_samples=10000)
 dataset = data_generator.generate_dataset()
 
-# Categorical variables to numerical values
+# Encode categorical variables to numerical values
 categorical_cols = dataset.select_dtypes(include='object').columns
 le = LabelEncoder()
 for col in categorical_cols:
@@ -129,32 +131,55 @@ X = dataset.drop(['ACCOUNT_NO', 'LI_FLAG'], axis=1)
 y = dataset['LI_FLAG']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# XGBoost classifier
-model = XGBClassifier()
+# Scale the features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
-# Train the model
-model.fit(X_train, y_train)
+# Define classifiers to evaluate
+classifiers = {
+    "XGBoost": XGBClassifier(use_label_encoder=False, eval_metric='logloss'),
+    "Random Forest": RandomForestClassifier(),
+    "Logistic Regression": LogisticRegression(max_iter=2000),  # Increased iterations
+    "Support Vector Classifier": SVC(probability=True)
+}
 
-# Evaluate the model on the test set
-y_pred = model.predict(X_test)
+# Store results for comparison
+results = {}
 
-# Confusion Matrix and Classification Report
-conf_matrix = confusion_matrix(y_test, y_pred)
-class_report = classification_report(y_test, y_pred)
+# Train and evaluate each classifier
+for name, model in classifiers.items():
+    if name in ["Logistic Regression"]:
+        model.fit(X_train_scaled, y_train)  # Use scaled data for Logistic Regression
+        y_pred = model.predict(X_test_scaled)
+    else:
+        model.fit(X_train, y_train)  # Use original data for other classifiers
+        y_pred = model.predict(X_test)
+    
+    # Calculate accuracy
+    accuracy = accuracy_score(y_test, y_pred)
+    results[name] = accuracy
+    
+    # Print confusion matrix and classification report
+    print(f"\n{name} Results:")
+    print("Confusion Matrix:")
+    print(confusion_matrix(y_test, y_pred))
+    print("\nClassification Report:")
+    #print(classification_report(y_test, y_pred))
+    print(classification_report(y_test, y_pred, zero_division=1))
 
-print("Confusion Matrix:")
-print(conf_matrix)
-print("\nClassification Report:")
-print(class_report)
+# Determine the best classifier
+best_classifier_name = max(results, key=results.get)
+best_classifier_accuracy = results[best_classifier_name]
 
-# Explain the model's predictions using SHAP values
-explainer = shap.TreeExplainer(model)
-shap_values = explainer.shap_values(X)
+print(f"\nBest Classifier: {best_classifier_name} with Accuracy: {best_classifier_accuracy:.2f}")
+
+# Explain the best model's predictions using SHAP values
+best_model = classifiers[best_classifier_name]
+explainer = shap.Explainer(best_model, X_train_scaled if best_classifier_name == "Logistic Regression" else X_train)
+shap_values = explainer(X_test_scaled if best_classifier_name == "Logistic Regression" else X_test)
 
 # Visualize the SHAP values
 plt.figure(figsize=(10, 6))
-shap.summary_plot(shap_values, X, plot_type="bar")
+shap.summary_plot(shap_values, X_test_scaled if best_classifier_name == "Logistic Regression" else X_test, plot_type="bar")
 plt.show()
-
-# Demo call for analysing SHAP dependence plot for a specific feature
-# shap.dependence_plot('feature_name', shap_values, X)
