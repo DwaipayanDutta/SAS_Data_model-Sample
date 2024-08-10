@@ -221,7 +221,7 @@ class SHAPExplainer:
         self.X_train = X_train
         self.X_test = X_test
         
-        # Use different explainers based on the model type
+        # Explainers based on the model type
         if isinstance(model, (XGBClassifier, RandomForestClassifier)):
             self.explainer = shap.TreeExplainer(model)
         elif isinstance(model, LogisticRegression):
@@ -231,7 +231,7 @@ class SHAPExplainer:
         else:
             raise ValueError("Unsupported model type for SHAP explainer")
         
-        # Calculate SHAP values
+        
         try:
             self.shap_values = self.explainer.shap_values(X_test)
         except shap.ExplainerError as e:
@@ -244,7 +244,7 @@ class SHAPExplainer:
         shap.summary_plot(self.shap_values, self.X_test, plot_type="bar")
         plt.show()
 
-# Usage
+# Finally Jay ram ji ki 
 if __name__ == "__main__":
     display_script_banner()
     
