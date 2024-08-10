@@ -65,7 +65,7 @@ From this matrix, various performance metrics can be derived, including accuracy
 
 To build the logistic regression model in SAS with synthetic data, follow these steps:
 
-1. **Generate Synthetic Data**: Run the Python script `data_generator.py` to create the synthetic dataset. ![Python Icon](https://image.flaticon.com/icons/png/512/919/919852.png)
+1. **Generate Synthetic Data**: Run the Python script `data_generator.py` to create the synthetic dataset. 
 2. **Import Data into SAS**: Load the generated data into SAS. 📊
 3. **Perform Exploratory Data Analysis (EDA)**: Analyze the data to understand relationships between predictors and the target variable. 🔍
 4. **Split the Data**: Divide the data into training and validation sets. 📈
@@ -76,7 +76,7 @@ To build the logistic regression model in SAS with synthetic data, follow these 
 
 ## Usage
 
-To generate synthetic data and model execute the following command in your terminal:
+To generate synthetic data and model, execute the following command in your terminal:
 
 ```bash
 python Master_File.py
