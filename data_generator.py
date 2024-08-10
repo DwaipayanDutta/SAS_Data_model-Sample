@@ -1,17 +1,38 @@
 import subprocess
 import sys
+import numpy as np
+import pandas as pd
+import os
+from colorama import Fore, Style
 
 # Function to install missing packages
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-# List of required packages
 required_packages = ['numpy', 'pandas', 'colorama']
 
+def display_script_banner():
+    owner_name = 'By: Dwaipayan Dutta'
+    banner = rf"""
+  {Fore.YELLOW}___       _           ___                       _           
+ |   \ __ _| |_ __ _   / __|___ _ _  ___ _ _ __ _| |_ ___ _ _ 
+ | |) / _` |  _/ _` | | (_ / -_) ' \/ -_) '_/ _` |  _/ _ \ '_|
+ |___/\__,_|\__\__,_|  \___\___|_||_\___|_| \__,_|\__\___/_|  
+                                                               
+    \t┌──────────────────────────────────────────────────────────────┐
+    \t│                                                              │        
+    \t│ {Fore.GREEN}Data Generation Code{Style.RESET_ALL}                                         │     
+    \t│ {Fore.BLUE}{owner_name}{Style.RESET_ALL}                                          │
+    \t│                                                              │
+    \t└──────────────────────────────────────────────────────────────┘
+    """
+    print(banner)
+
 class DataGenerator:
-    def __init__(self, n_samples=10000):
+    def __init__(self, n_samples=10000, export_path='dataset.csv'):
         np.random.seed(42)
         self.n_samples = n_samples
+        self.export_path = export_path
         self.continuous_data = None
         self.categorical_data = None
         self.final_data = None
@@ -44,6 +65,17 @@ class DataGenerator:
             for _, row in data_summary.iterrows()
         ], axis=1)
 
+        # Apply constraints
+        self.continuous_data['AGE'] = np.random.randint(1, 100, size=self.n_samples)  # AGE between 1 and 99
+        self.continuous_data['AQB_BALANCE'] = np.random.uniform(0, 10000000, size=self.n_samples)  # AQB_BALANCE between 0 and 10,000,000
+        self.continuous_data['CIBIL_SCORE'] = np.random.randint(300, 901, size=self.n_samples)  # CIBIL_SCORE between 300 and 900
+        self.continuous_data['CREDIT_CARD_LIMIT'] = np.random.uniform(0, 1000000, size=self.n_samples)  # CREDIT_CARD_LIMIT between 0 and 1,000,000
+
+        # Generate KYC_LAST_DONE_DATE between 01-01-2020 and 01-12-2023
+        start_date = np.datetime64('2020-01-01')
+        end_date = np.datetime64('2023-12-01')
+        self.continuous_data['KYC_LAST_DONE_DATE'] = np.random.choice(pd.date_range(start_date, end_date), size=self.n_samples)
+
     def generate_categorical_data(self):
         cat_variables = {
             'ACCOUNT_TYPE': ['SAVINGS', 'CURRENT'],
@@ -62,7 +94,7 @@ class DataGenerator:
                       'Sikkim', 'Arunachal Pradesh', 'Meghalaya', 'Mizoram', 'Andaman and Nicobar']
         }
 
-        # Prob
+        # Probabilities for categorical variables
         prob = {
             'ACCOUNT_TYPE': [0.80, 0.20],
             'CUSTOMER_TAG': [0.5, 0.5],
@@ -80,7 +112,7 @@ class DataGenerator:
                       0.00107882, 0.000526091, 1.66485E-05]
         }
 
-        # List All flags 
+        # List of flag variables
         flag_variables = ['FD_FLAG', 'GI_FLAG', 'HEALTH_FLAG', 'LI_FLAG', 'MASS_FLAG', 'MF_FLAG', 'NR_FLAG']
 
         for flag_var in flag_variables:
@@ -101,7 +133,14 @@ class DataGenerator:
         self.combine_data()
         return self.final_data
 
-# Calling function 
-data_generator = DataGenerator(n_samples=10000)
-dataset = data_generator.generate_dataset()
-print(dataset.head())
+    def export_to_csv(self):
+        self.final_data.to_csv(self.export_path, index=False)
+        print(f"Dataset exported to: {os.path.abspath(self.export_path)}")
+
+# Final
+if __name__ == "__main__":
+    display_script_banner()
+    data_generator = DataGenerator(n_samples=10000)
+    dataset = data_generator.generate_dataset()
+    print(dataset.head())
+    data_generator.export_to_csv()
