@@ -99,7 +99,6 @@ data_generator = DataGenerator(n_samples=10000)
 dataset = data_generator.generate_dataset()
 print(dataset.head())
 
-
 # Model Code for testing :
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
