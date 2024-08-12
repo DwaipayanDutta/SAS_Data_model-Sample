@@ -56,20 +56,40 @@ class DataGenerator:
         }
 
         data_summary = pd.DataFrame(cont_dict)
-        data_summary = data_summary[~data_summary['Variable'].isin(['FD_FLAG', 'GI_FLAG', 'HEALTH_FLAG', 'LI_FLAG', 'MASS_FLAG',
-                                                                   'MF_FLAG', 'NR_FLAG'])]
 
-        # Continuous data
-        self.continuous_data = pd.concat([
-            pd.DataFrame({row['Variable']: np.random.gamma(row['Mean'], row['Std Dev'], size=self.n_samples)})
-            for _, row in data_summary.iterrows()
-        ], axis=1)
-
-        # Apply constraints
-        self.continuous_data['AGE'] = np.random.randint(1, 100, size=self.n_samples)  # AGE between 1 and 99
-        self.continuous_data['AQB_BALANCE'] = np.random.uniform(0, 10000000, size=self.n_samples)  # AQB_BALANCE between 0 and 10,000,000
-        self.continuous_data['CIBIL_SCORE'] = np.random.randint(300, 901, size=self.n_samples)  # CIBIL_SCORE between 300 and 900
-        self.continuous_data['CREDIT_CARD_LIMIT'] = np.random.uniform(0, 1000000, size=self.n_samples)  # CREDIT_CARD_LIMIT between 0 and 1,000,000
+        # Continuous data generation with constraints
+        self.continuous_data = pd.DataFrame({
+            'AGE': np.random.randint(1, 100, size=self.n_samples),  # AGE between 1 and 99
+            'AQB_BALANCE': np.random.uniform(0, 10_000_000, size=self.n_samples),  # AQB_BALANCE between 0 and 10,000,000
+            'AUM': np.random.randint(0, 10_000_000, size=self.n_samples),  # AUM not more than 10,000,000
+            'CIBIL_SCORE': np.random.randint(300, 901, size=self.n_samples),  # CIBIL_SCORE between 300 and 900
+            'CREDIT_CARD_LIMIT': np.random.randint(0, 50_000_000, size=self.n_samples),  # CREDIT_CARD_LIMIT not more than 50,000,000
+            'CR_AMT_12MNTH': np.random.randint(0, 50_000_000, size=self.n_samples),  # CR_AMT_12MNTH not more than 50,000,000
+            'CR_CNT_12MNTH': np.random.randint(0, 21, size=self.n_samples),  # CR_CNT_12MNTH not more than 20
+            'DC_APPAREL_30DAYS_ACTV': np.random.randint(0, 11, size=self.n_samples),  # not more than 10
+            'DC_ECOM_30DAYS_AMT': np.random.randint(0, 1_500_000, size=self.n_samples),  # not more than 1,500,000
+            'DC_ECOM_30DAYS_CNT': np.random.randint(0, 501, size=self.n_samples),  # not more than 500
+            'DC_FOOD_30DAYS_ACTV': np.random.randint(0, 11, size=self.n_samples),  # not more than 10
+            'DC_FUEL_30DAYS_ACTV': np.random.randint(0, 11, size=self.n_samples),  # not more than 10
+            'DC_GROCRY_30DAYS_ACTV': np.random.randint(0, 11, size=self.n_samples),  # not more than 10
+            'DC_OTT_30DAYS_ACTV': np.random.randint(0, 11, size=self.n_samples),  # not more than 10
+            'DC_POS_30DAYS_AMT': np.random.randint(0, 4_000_000, size=self.n_samples),  # not more than 4,000,000
+            'DC_POS_30DAYS_CNT': np.random.randint(0, 101, size=self.n_samples),  # not more than 100
+            'DC_RECHARGE_30DAYS_ACTV': np.random.randint(0, 11, size=self.n_samples),  # not more than 10
+            'DC_TRAVEL_30DAYS_ACTV': np.random.randint(0, 11, size=self.n_samples),  # not more than 10
+            'DC_UTILITY_30DAYS_ACTV': np.random.randint(0, 11, size=self.n_samples),  # not more than 10
+            'DR_AMT_12MNTH': np.random.uniform(0, 10_000_000, size=self.n_samples),  # not more than 10,000,000
+            'DR_CNT_12MNTH': np.random.randint(0, 21, size=self.n_samples),  # not more than 20
+            'DR_CR_RATIO': np.random.uniform(0, 1, size=self.n_samples),  # DR_CR_RATIO between 0 and 1
+            'FD_COUNT': np.random.randint(0, 21, size=self.n_samples),  # FD_COUNT not more than 20
+            'FD_CURRENTMONTHANR': np.random.uniform(0, 10_000_000, size=self.n_samples),  # not more than 10,000,000
+            'INCOME_NET': np.random.uniform(0, 10_000_000, size=self.n_samples),  # not more than 10,000,000
+            'MONTHLY_BALANCE': np.random.uniform(0, 10_000_000, size=self.n_samples),  # not more than 10,000,000
+            'NRV': np.random.uniform(0, 10_000_000, size=self.n_samples),  # not more than 10,000,000
+            'TOTAL_LIVE_SECURED_AMT': np.random.uniform(0, 10_000_000, size=self.n_samples),  # not more than 10,000,000
+            'TOTAL_LIVE_UNSECURED_AMT': np.random.uniform(0, 10_000_000, size=self.n_samples),  # not more than 10,000,000
+            'VINTAGE_DAYS': np.random.randint(0, 366, size=self.n_samples)  # VINTAGE_DAYS not more than 365
+        })
 
         # Generate KYC_LAST_DONE_DATE between 01-01-2020 and 01-12-2023
         start_date = np.datetime64('2020-01-01')
@@ -114,7 +134,6 @@ class DataGenerator:
 
         # List of flag variables
         flag_variables = ['FD_FLAG', 'GI_FLAG', 'HEALTH_FLAG', 'LI_FLAG', 'MASS_FLAG', 'MF_FLAG', 'NR_FLAG']
-
         for flag_var in flag_variables:
             cat_variables[flag_var] = ['Y', 'N']
             prob[flag_var] = [0.5, 0.5]
