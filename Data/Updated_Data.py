@@ -125,13 +125,8 @@ class DataGenerator:
 # Data generation
 data_generator = DataGenerator(n_samples=10000)
 df = data_generator.generate_dataset()  # Generate the dataset first
-
-# Now you can safely access the columns
 categorical_columns = data_generator.get_categorical_columns()
 continuous_columns = data_generator.get_continuous_columns()
-
 print("Categorical Columns:", categorical_columns)
 print("Continuous Columns:", continuous_columns)
-
-# Optionally export to CSV
 data_generator.export_to_csv()
