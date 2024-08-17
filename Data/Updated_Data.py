@@ -1,42 +1,14 @@
-import subprocess
-import sys
-import numpy as np
-import pandas as pd
 import os
-from colorama import Fore, Style
-from sklearn.preprocessing import StandardScaler, LabelEncoder
-#from xgboost import XGBClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
-#import shap
-import matplotlib.pyplot as plt
-from tqdm import tqdm
+import sys
+import subprocess
 
-# Function to install missing packages
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-required_packages = ['numpy', 'pandas', 'colorama']
-
-def display_script_banner():
-     owner_name = 'By: Dwaipayan Dutta'
-     banner = rf"""
-   {Fore.YELLOW}___       _           ___                       _           
-   |   \ __ _| |_ __ _   / __|___ _ _  ___ _ _ __ _| |_ ___ _ _ 
-   | |) / _` |  _/ _` | | (_ / -_) ' \/ -_) '_/ _` |  _/ _ \ '_|
-   |___/\__,_|\__\__,_|  \___\___|_||_\___|_| \__,_|\__\___/_|  
-                                                               
-     \t┌──────────────────────────────────────────────────────────────┐
-     \t│                                                              │        
-     \t│ {Fore.GREEN}Data Generation Code{Style.RESET_ALL}                                         │     
-     \t│ {Fore.BLUE}{owner_name}{Style.RESET_ALL}                                          │
-     \t│                                                              │
-     \t└──────────────────────────────────────────────────────────────┘
-     """
-     print(banner)
+try:
+    import numpy as np
+    import pandas as pd
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy", "pandas"])
+    import numpy as np
+    import pandas as pd
 
 class DataGenerator:
     def __init__(self, n_samples=10000, export_path='dataset.csv'):
@@ -65,29 +37,26 @@ class DataGenerator:
                         39394146.0, 31877424.32, 24655099.6, 3300140.98, 1216.33],
             'Min' : [1,0,0,300,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], 
             'Max' : [100, 10_000_000, 10_000_000,901,50_000_000, 50_000_000, 21, 11, 1_500_000, 501, 11, 11, 11, 11, 4_000_000, 101,11,11,11,10_000_000, 21,1,21,  10_000_000, 10_000_000, 10_000_000, 10_000_000, 10_000_000, 10_000_000, 366]
-        }
-        
-  
+        } 
         data_summary = pd.DataFrame(cont_dict)
-
-
         uni_columns = ['AQB_BALANCE','DR_AMT_12MNTH','DR_CR_RATIO','FD_CURRENTMONTHANR','INCOME_NET','MONTHLY_BALANCE','NRV','TOTAL_LIVE_SECURED_AMT','TOTAL_LIVE_UNSECURED_AMT']
-
-        # Continuous data generation with constraints
-        
+       
         self.continuous_data = pd.DataFrame(columns = cont_dict['Variable'])
 
         for variable, min, max in zip(cont_dict['Variable'], cont_dict['Min'], cont_dict['Max']):
             if variable in uni_columns:
                 self.continuous_data[variable] = np.round(np.random.uniform(min, max, size=self.n_samples))
             else:
-              self.continuous_data[variable] = np.random.randint(min, max, size = self.n_samples)
-
-
-        # Generate KYC_LAST_DONE_DATE between 01-01-2020 and 01-12-2023
+                self.continuous_data[variable] = np.random.randint(min, max, size=self.n_samples)
+        
         start_date = np.datetime64('2020-01-01')
         end_date = np.datetime64('2023-12-01')
         self.continuous_data['KYC_LAST_DONE_DATE'] = np.random.choice(pd.date_range(start_date, end_date), size=self.n_samples)
+    
+    def get_continuous_columns(self):
+        if self.continuous_data is None:
+            raise ValueError("Continuous data has not been generated.")
+        return self.continuous_data.columns.tolist()
 
     def generate_categorical_data(self):
         cat_variables = {
@@ -125,15 +94,18 @@ class DataGenerator:
                       0.00107882, 0.000526091, 1.66485E-05]
         }
 
-        # List of flag variables
         flag_variables = ['FD_FLAG', 'GI_FLAG', 'HEALTH_FLAG', 'LI_FLAG', 'MASS_FLAG', 'MF_FLAG', 'NR_FLAG']
         for flag_var in flag_variables:
             cat_variables[flag_var] = ['Y', 'N']
             prob[flag_var] = [0.5, 0.5]
-
-        # Categorical data
+        
         self.categorical_data = pd.DataFrame({col: np.random.choice(cat_variables[col], self.n_samples, p=prob[col]) for col in cat_variables})
         self.categorical_data['ACCOUNT_NO'] = self.categorical_data.index
+    
+    def get_categorical_columns(self):
+        if self.categorical_data is None:
+            raise ValueError("Categorical data has not been generated.")
+        return self.categorical_data.columns.tolist()
 
     def combine_data(self):
         # Combine categorical and continuous data
@@ -150,10 +122,16 @@ class DataGenerator:
         print(f"Dataset exported to: {os.path.abspath(self.export_path)}")
 
 
-# Final
-if __name__ == "__main__":
-    display_script_banner()
-    data_generator = DataGenerator(n_samples=10000)
-    dataset = data_generator.generate_dataset()
-    print(dataset.head())
-    data_generator.export_to_csv()
+# Data generation
+data_generator = DataGenerator(n_samples=10000)
+df = data_generator.generate_dataset()  # Generate the dataset first
+
+# Now you can safely access the columns
+categorical_columns = data_generator.get_categorical_columns()
+continuous_columns = data_generator.get_continuous_columns()
+
+print("Categorical Columns:", categorical_columns)
+print("Continuous Columns:", continuous_columns)
+
+# Optionally export to CSV
+data_generator.export_to_csv()
