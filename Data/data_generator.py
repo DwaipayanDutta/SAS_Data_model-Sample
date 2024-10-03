@@ -159,7 +159,7 @@ class DataGenerator:
 # Final
 if __name__ == "__main__":
     display_script_banner()
-    data_generator = DataGenerator(n_samples=10000)
+    data_generator = DataGenerator(n_samples=50000)
     dataset = data_generator.generate_dataset()
     print(dataset.head())
     data_generator.export_to_csv()
