@@ -157,6 +157,7 @@ def main():
             crosstab = pd.crosstab(analyzer.df[var], analyzer.df[analyzer.target_variable])
             crosstab.plot(kind='bar', stacked=True, figsize=(10, 5), color=sns.color_palette("Paired"))
             plt.title(f'Stacked Bar Plot of {var} by {analyzer.target_variable}')
+            plt.ylabel('Count')  # Adding the y-label
             plt.tight_layout()
             plt.savefig('temp_stacked_bar.png')
             plt.close()
