@@ -332,9 +332,15 @@ class data_preprocess():
     def data_split(self):
         if self.validation is None:
             self.train, self.test = train_test_split(self.df, test_size=self.test_split, random_state=42, stratify=self.df[self.target])
+            self.train = self.train.reset_index(drop = True)
+            self.test = self.test.reset_index(drop = True)
         else:
             self.train, test_valid = train_test_split(self.df, test_size=self.test_split, random_state=42, stratify=self.df[self.target])
-            self.test, self.valid = train_test_split(test_valid, test_size=0.5, random_state=42, stratify=test_valid[self.target])   
+            self.train = self.train.reset_index(drop = True)
+            test_valid = test_valid.reset_index(drop = True)
+            self.test, self.valid = train_test_split(test_valid, test_size=0.5, random_state=42, stratify=test_valid[self.target]) 
+            self.test =  self.test.reset_index(drop = True)
+            self.valid =  self.valid.reset_index(drop = True)  
 
     def data_transformation(self):
         if self.validation is None:
